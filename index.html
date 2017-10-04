@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="referrer" content="no-referrer" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="vendor/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <style>
+        .partsrow-template {
+            display: none;
+        }
+
+        #partsrow-table {
+            counter-reset: rowNumber;
+        }
+
+        #partsrow-table tbody tr:not(.partsrow-template) {
+            counter-increment: rowNumber;
+        }
+
+        #partsrow-table tbody tr td:first-child::before {
+            content: counter(rowNumber);
+            min-width: 1em;
+            margin-right: 0.5em;
+        }
+
+        .partsrow-draghandle {
+            float: right
+        }
+    </style>
+    <title>hfy2epub</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+        <h1>hfy2epub</h1>
+        <p>hfy2epub is web-tool to turn post series from <a href="https://www.reddit.com/r/HFY/">reddit.com/r/HFY</a> into EPUB files for easy offline consumption with a reader or text-to-speech.
+        All work to identify the posts, fetch them and turn them into an epub are performed in the browser with no server component required.</p>
+        <div class="alert alert-danger">
+            <b>Note:</b> Be fair to the authors. Do not distribute the resulting EPUB files unless you own the rights to all the material and/or the author gave you permission. In general respect the author's wishes and do not use this tool if the author is not ok with it. When in doubt ask the author.
+        </div>
+        </div>
+        <div class="row">
+            <form id="retrieveInfoForm">
+                <div class="form-group">
+                    <label for="startUrl">URL to first post in HFY series or wiki index page:</label>
+                    <input class="form-control" id="startUrl" type="text"/>
+                    <small class="form-text">This script uses heuristics to either follow the "next" links from a given post or to extract the list of parts from a wiki page.</small>
+                </div>
+                <div class="form-group">
+                    <label for="nextPostRegex">Regex to identify next post link (not used for wiki)</label>
+                    <input class="form-control" id="nextPostRegex" value="next|epilogue|part|chapter|episode" type="text"/>
+                    <small class="form-text">Tweaking this might help if not all parts of a series are detected. For more information about regular expressions see <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions">here</a></small>
+                </div>
+                <div class="form-group">
+                    <label for="delayBetweenRequests">Delay between requests in seconds</label>
+                    <input class="form-control" id="delayBetweenRequests" type="number" value="2.0" step="0.1">
+                    <small class="form-text">Reddit does not like people hammering their site. Requests from this page will show up as coming from your ip/account. Act accordingly.</small>
+                </div>
+                <button class="btn btn-primary form-control" id="retrieveInfoBtn">Retrieve series info</button>
+            </form>
+        </div>
+        <div class="row">
+                <h2>Series information</h2>
+                <form id="epubMakerForm">
+                    <div class="form-group">
+                        <label for="seriesTitle">Title:</label>
+                        <input class="form-control" id="seriesTitle" type="text"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="seriesAuthor">Author:</label>
+                        <input class="form-control" id="seriesAuthor" type="text"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="partsrow-table">Parts:</label>
+                        <table id="partsrow-table" class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Part title</th>
+                                    <th scope="col">URL</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="partsrow partsrow-template">
+                                    <td scope="col"><span class="partsrow-draghandle"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></span></td>
+                                    <td class="partsrow-title" contenteditable="true"></td>
+                                    <td class="partsrow-url" contenteditable="true"></td>
+                                    <td class="partsrow-link"><a target="_blank" href="#"><span class="glyphicon glyphicon-new-window" aria-hidden="true"></span> Visit</a></td>
+                                    <td class="partsrow-remove"><a class="partsrow-remove-btn" title="Remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p><button id="partsrow-add-btn" class="btn btn-light btn-block" type="button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add part</button></p>
+                    </div>
+                    <button type="submit" class="btn btn-primary form-control" id="epubMakerBtn">Download EPUB</button>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <label for="logList">Log:</label>
+            <ul class="list-group" id="logList"></ul>
+        </div>
+
+    </div>
+    <script src="vendor/js/jszip.min.js"></script>
+    <script src="vendor/js/jszip-utils.min.js"></script>
+    <script src="vendor/js/FileSaver.min.js"></script>
+    <script src="vendor/js/handlebars.min.js"></script>
+    <script src="vendor/js/underscore.string.min.js"></script>
+    <script src="vendor/js/beautify-html.js"></script>
+    <script src="vendor/js/js-epub-maker.js"></script>
+    <script src="vendor/js/he.js"></script>
+    <script src="vendor/Sortable-1.4.0/Sortable.min.js"></script>
+    <script src="js/hfy2epub.js"></script>
+</body>
+</html>
