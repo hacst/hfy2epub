@@ -33,13 +33,13 @@
 
 <body>
     <div class="container">
-        <div class="row">
-        <h1>hfy2epub</h1>
-        <p>hfy2epub is web-tool to turn post series from <a href="https://www.reddit.com/r/HFY/">reddit.com/r/HFY</a> into EPUB files for easy offline consumption with a reader or text-to-speech.
-        All work to identify the posts, fetch them and turn them into an epub are performed in the browser with no server component required.</p>
+        <div class="jumbotron">
+            <h1>hfy2epub</h1>
+            hfy2epub is web-tool to turn post series from <a href="https://www.reddit.com/r/HFY/">reddit.com/r/HFY</a> into EPUB files for easy offline consumption with a reader or text-to-speech.
+                All work to identify the posts, fetch them and turn them into an EPUB are performed in the browser.
+        </div>
         <div class="alert alert-danger">
             <b>Note:</b> Be fair to the authors. Do not distribute the resulting EPUB files unless you own the rights to all the material and/or the author gave you permission. In general respect the author's wishes and do not use this tool if the author is not ok with it. When in doubt ask the author.
-        </div>
         </div>
         <div class="row">
             <form id="retrieveInfoForm">
@@ -62,49 +62,48 @@
             </form>
         </div>
         <div class="row">
-                <h2>Series information</h2>
-                <form id="epubMakerForm">
-                    <div class="form-group">
-                        <label for="seriesTitle">Title:</label>
-                        <input class="form-control" id="seriesTitle" type="text"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="seriesAuthor">Author:</label>
-                        <input class="form-control" id="seriesAuthor" type="text"/>
-                    </div>
-                    <div class="form-group">
-                        <label for="partsrow-table">Parts:</label>
-                        <table id="partsrow-table" class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Part title</th>
-                                    <th scope="col">URL</th>
-                                    <th></th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="partsrow partsrow-template">
-                                    <td scope="col"><span class="partsrow-draghandle"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></span></td>
-                                    <td class="partsrow-title" contenteditable="true"></td>
-                                    <td class="partsrow-url" contenteditable="true"></td>
-                                    <td class="partsrow-link"><a target="_blank" href="#"><span class="glyphicon glyphicon-new-window" aria-hidden="true"></span> Visit</a></td>
-                                    <td class="partsrow-remove"><a class="partsrow-remove-btn" title="Remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <p><button id="partsrow-add-btn" class="btn btn-light btn-block" type="button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add part</button></p>
-                    </div>
-                    <button type="submit" class="btn btn-primary form-control" id="epubMakerBtn">Download EPUB</button>
-                </form>
-            </div>
+            <h2 id="seriesInformationHead">Series information</h2>
+            <form id="epubMakerForm">
+                <div class="form-group">
+                    <label for="seriesTitle">Title:</label>
+                    <input class="form-control" id="seriesTitle" type="text"/>
+                </div>
+                <div class="form-group">
+                    <label for="seriesAuthor">Author:</label>
+                    <input class="form-control" id="seriesAuthor" type="text"/>
+                </div>
+                <div class="form-group">
+                    <label for="partsrow-table">Parts:</label>
+                    <table id="partsrow-table" class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Part title</th>
+                                <th scope="col">URL</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="partsrow partsrow-template">
+                                <td scope="col"><span class="partsrow-draghandle"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></span></td>
+                                <td class="partsrow-title" contenteditable="true"></td>
+                                <td class="partsrow-url" contenteditable="true"></td>
+                                <td class="partsrow-link"><a target="_blank" href="#"><span class="glyphicon glyphicon-new-window" aria-hidden="true"></span> Visit</a></td>
+                                <td class="partsrow-remove"><a class="partsrow-remove-btn" title="Remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p><button id="partsrow-add-btn" class="btn btn-light btn-block" type="button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add part</button></p>
+                </div>
+                <button type="submit" class="btn btn-primary form-control" id="epubMakerBtn">Download EPUB</button>
+            </form>
         </div>
-        <div class="row">
+        <div class="col">
+            <br />
             <label for="logList">Log:</label>
             <ul class="list-group" id="logList"></ul>
         </div>
-
     </div>
     <script src="vendor/js/jszip.min.js"></script>
     <script src="vendor/js/jszip-utils.min.js"></script>

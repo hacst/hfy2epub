@@ -337,6 +337,8 @@ function addPartToList(part)
     updateLink();
 
     tbody.appendChild(instance);
+
+    instance.scrollIntoView(false);
 }
 
 // Given a part object of structure {title:string, url:string} either
@@ -350,6 +352,7 @@ function addOrUpdatePartInList(part)
     } else {
         row.querySelector(".partsrow-title").textContent = part.title;
         updateRowState(row, isNameCached(nameFromURL(part.url)) ? "success" : "none");
+        row.scrollIntoView(false);
     }
 }
 
@@ -413,6 +416,7 @@ function createAndDownloadSeriesAsEpub(event)
             var row = getRowForPart(post.url);
             if (row) {
                 updateRowState(row, isNameCached(nameFromURL(post.url)) ? "success" : "none");
+                row.scrollIntoView(true);
             }
             log("Collected post in series: '" + post.title + "'");
         },
@@ -451,7 +455,9 @@ function createAndDownloadSeriesAsEpub(event)
         },
         error: function(error) {
             log("Aborting collection due to failure to collect '" + error.part.title + "': " + error.message, "danger");
-            updateRowState(getRowForPart(error.part.url), "danger");
+            var row = getRowForPart(error.part.url);
+            updateRowState(row, "danger");
+            row.scrollIntoView(true);
             epubMakerBtn.disabled = false;
         }
     });
@@ -473,6 +479,8 @@ function retrieveSeriesInfo(event)
                     document.querySelector('#seriesTitle').value = series.title;
 
                     series.parts.forEach(function(part) { addPartToList(part); });
+
+                    document.getElementById("epubMakerBtn").scrollIntoView(false);
                     retrieveInfoBtn.disabled = false;
                 },
                 function (error) {
@@ -500,6 +508,7 @@ function retrieveSeriesInfo(event)
                         },
                         done: function(posts) {
                             log("Done following series links. Found " + posts.length + " posts", "success");
+                            document.getElementById("epubMakerBtn").scrollIntoView(false);
                             retrieveInfoBtn.disabled = false;
                         },
                         error: function(e) {
@@ -521,6 +530,7 @@ function retrieveSeriesInfo(event)
         console.log(error);
         retrieveInfoBtn.disabled = false;
     });
+    document.getElementById("seriesInformationHead").scrollIntoView(true);
 }
 
 var delayBetweenRequestsInput  = document.getElementById("delayBetweenRequests");
