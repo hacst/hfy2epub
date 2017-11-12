@@ -30,21 +30,23 @@
     </style>
     <title>hfy2epub</title>
 </head>
-
 <body>
+    <a href="https://github.com/hacst/hfy2epub"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
     <div class="container">
         <div class="jumbotron">
             <h1>hfy2epub</h1>
             hfy2epub is web-tool to turn post series from <a href="https://www.reddit.com/r/HFY/">reddit.com/r/HFY</a> into EPUB files for easy offline consumption with a reader or text-to-speech.
                 All work to identify the posts, fetch them and turn them into an EPUB are performed in the browser.
         </div>
-        <div class="alert alert-danger">
-            <b>Note:</b> Be fair to the authors. Do not distribute the resulting EPUB files unless you own the rights to all the material and/or the author gave you permission. In general respect the author's wishes and do not use this tool if the author is not ok with it. When in doubt ask the author.
+        <div class="row">
+            <div class="alert alert-danger">
+                <b>Note:</b> Be fair to the authors. Do not distribute the resulting EPUB files unless you own the rights to all the material and/or the author gave you permission. In general respect the author's wishes and do not use this tool if the author is not ok with it. When in doubt ask the author.
+            </div>
         </div>
         <div class="row">
             <form id="retrieveInfoForm">
                 <div class="form-group">
-                    <label for="startUrl">URL to first post in HFY series or wiki index page:</label>
+                    <label for="startUrl">URL to first post in <a href="https://www.reddit.com/r/HFY/">HFY</a> series or <a href="https://www.reddit.com/r/HFY/wiki/index">wiki</a> story index page:</label>
                     <input class="form-control" id="startUrl" type="text"/>
                     <small class="form-text">This script uses heuristics to either follow the "next" links from a given post or to extract the list of parts from a wiki page.</small>
                 </div>
@@ -99,7 +101,7 @@
                 <button type="submit" class="btn btn-primary form-control" id="epubMakerBtn">Download EPUB</button>
             </form>
         </div>
-        <div class="col">
+        <div class="row">
             <br />
             <label for="logList">Log:</label>
             <ul class="list-group" id="logList"></ul>
