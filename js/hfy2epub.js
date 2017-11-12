@@ -469,7 +469,8 @@ function retrieveSeriesInfo(event)
     event.preventDefault();
     retrieveInfoBtn.disabled = true;
     clearPartsFromList();
-    var startUrl = getStartUrl();
+    var startUrl = getStartUrl().replace(/^http:\/\//i, 'https://'); // Ensure https to prevent mixed content
+    
     requestRedditJSONCached(startUrl, function(json) {
         if (json.kind == "wikipage") {
             collectSeriesInfoFromWikiPage(startUrl, function(series) {

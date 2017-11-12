@@ -13,7 +13,7 @@ All work to identify the posts, fetch them and turn them into an epub are perfor
 ## Usage
 Before you do anything with this tool be aware that you must not distribute the epub files created by this tool if the author has not given you permission to do so. In general respect the author's wishes and do not use this tool if the author is not ok with it. When in doubt ask the author.
 
-With that out of the way using hfy2epub is quite straight-forward. All you need is the URL of a HFY wiki page listing the parts of a series or the first post of a series that links to future posts with next links.
+With that out of the way using hfy2epub is quite straight-forward. After opening [index.html](https://hacst.net/hfy2epub/index.html) in your browser all you need is the URL of a HFY wiki page listing the parts of a series or the first post of a series that links to future posts with next links.
 
 After providing that URL press the "Retrieve series info". This will try to populate title, author as well as the list of parts in the "Series information" section. Review the information and correct as needed.
 
