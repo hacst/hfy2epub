@@ -24,3 +24,5 @@ This tool has no ambitions to do everything for everyone. Series information det
 
 Also this tool makes no attempt to create an especially pretty EPUB. It simply slaps the HTML of first post of each detected part of the series into the EPUB. It is meant for reading not distribution.
 
+## For authors
+While we are very explicit about the user having to ensure the author is ok with it before using this tool and consider any EPUBs created the user's responsibility we have some limited ways to further discourage the use of the tool on your content. If you are an HFY author and do not want this tool to process your posts please create an issue on github so we can blacklist your posts. Note that this can not stop someone willing to edit the code to remove the block.

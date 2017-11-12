@@ -4,6 +4,18 @@ var requestRedditJsonCache = new Map();
 var timeOfLastRealRequest = 0;
 var timeInMsBetweenRequests = 2000; // Don't hammer the API
 
+// These authors have stated that they do not want their posts
+// to be turned into EPUBs. Please respect their wishes and do
+// not remove the blacklisting code
+var authorBlacklist = [
+];
+
+// The authors of these posts have stated that they do not want
+// this post to be turned into an EPUB. Please respect their wishes
+// and do not remove the blacklisting code
+var postNameBlacklist = [
+];
+
 // Attempts to retrieve the given reddit URL in json. For this it appends .json to the url
 //  If successful calls successCallback with the JSON object of the page
 //  If the request fails errorCallback is called with an error string describing the failure
@@ -178,9 +190,21 @@ function unshorten(url)
 function collectPost(url, successCallback, errorCallback)
 {
     var unshortenedUrl = unshorten(url);
+
+    if (postNameBlacklist.indexOf(nameFromURL(unshortenedUrl)) > -1) {
+        errorCallback("The author of '" + unshortenedUrl + "' requested that this post should not be processed with this tool.");
+        return;
+    }
+
     requestRedditJSONCached(unshortenedUrl, function(json) {
         var post = json[0]['data']['children'][0]['data']; // Post data
         var content = he.decode(post.selftext_html);
+
+        if (authorBlacklist.indexOf(post.author.toLowerCase()) > -1) {
+            errorCallback("The author of '" + post.url + "' requested that his posts should not be processed with this tool.");
+            return;
+        }
+
         var collectedPost = {
             author: post.author,
             title: post.title,
@@ -268,9 +292,8 @@ function findSeriesParts(startUrl, callbacks) {
                 }
             }
         }, function(error) {
-            console.log(error.log);
-            console.log(error.request);
-            log("Failed at post '" + url + "': " + error.message, "error");
+            console.log(error);
+            log("Failed at post '" + url + "': " + error, "error");
             if (callbacks.error) {
                 if (callbacks.error(error) === false) return;
             }
@@ -434,6 +457,7 @@ function createAndDownloadSeriesAsEpub(event)
                         content: '<div style="text-align: center;">' +
                         '<h1>' + he.encode(title) + '</h1>' +
                         '<h3>by <a href="https://reddit.com/u/' + he.encode(author) + '">' + he.encode(author) + '</a></h3>' +
+                        '<p>This EPUB was created using <a href="https://github.com/hacst/hfy2epub">https://github.com/hacst/hfy2epub</a> and must not to be distributed without the author\'s consent</p>' +
                         '</div>' +
                         '<div style=”page-break-before:always;”></div>'
                     }, false, true)
@@ -454,10 +478,12 @@ function createAndDownloadSeriesAsEpub(event)
             });
         },
         error: function(error) {
-            log("Aborting collection due to failure to collect '" + error.part.title + "': " + error.message, "danger");
+            var msg = "Aborting collection due to failure to collect '" + error.part.title + "': " + error.message;
+            log(msg, "danger");
             var row = getRowForPart(error.part.url);
             updateRowState(row, "danger");
             row.scrollIntoView(true);
+            alert(msg);
             epubMakerBtn.disabled = false;
         }
     });
@@ -470,7 +496,7 @@ function retrieveSeriesInfo(event)
     retrieveInfoBtn.disabled = true;
     clearPartsFromList();
     var startUrl = getStartUrl().replace(/^http:\/\//i, 'https://'); // Ensure https to prevent mixed content
-    
+
     requestRedditJSONCached(startUrl, function(json) {
         if (json.kind == "wikipage") {
             collectSeriesInfoFromWikiPage(startUrl, function(series) {
@@ -485,8 +511,10 @@ function retrieveSeriesInfo(event)
                     retrieveInfoBtn.disabled = false;
                 },
                 function (error) {
-                    log("Failed to retrieve series information from '" + startUrl + "'.");
+                    var msg = "Failed to retrieve series information from '" + startUrl + "'. Reason: " + error;
+                    log(msg, "danger");
                     console.log(error);
+                    alert(msg);
                     retrieveInfoBtn.disabled = false;
                 });
         }
@@ -513,8 +541,10 @@ function retrieveSeriesInfo(event)
                             retrieveInfoBtn.disabled = false;
                         },
                         error: function(e) {
-                            log("Error while following series links", "danger");
+                            var msg = "Error while following series links. Reason: " + e;
+                            log(e, "danger");
                             console.log(e);
+                            alert(e);
                             retrieveInfoBtn.disabled = false;
                         }
                     });
