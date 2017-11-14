@@ -146,16 +146,21 @@ function findNextURL(content, previousNames) {
 }
 
 // Returns the reddit name for a given url
-// The URL may be shortened
+// The URL may be shortened.
+// Full URLs may miss the reddit.com prefix and may refer to a comment
 function nameFromURL(url)
 {
-    var match = url.match(/redd\.it\/([A-Za-z0-9]+)/i);
+    var match = url.match(/redd\.it\/([A-Za-z0-9]+)/i); // Shortened
     if (match) {
         return match[1].toLowerCase();
     }
-    match = url.match(/r\/HFY\/comments\/([A-Za-z0-9]+)/i);
+    match = url.match(/r\/HFY\/comments\/([A-Za-z0-9]+)(?:\/\w*(\/[A-Za-z0-9]+))?/i);
     if (match) {
-        return match[1].toLowerCase();
+        var name = match[1].toLowerCase();
+        if (match[2]) {
+            name += "/" + match[2].toLowerCase(); // This is a nested name referring to a comment.
+        }
+        return name;
     }
     return undefined;
 }
@@ -180,6 +185,50 @@ function unshorten(url)
     return urlFromName(nameFromURL(url));
 }
 
+// Given a post and child data for it heuristically tries to determine whether the author
+// continue the story in the comments and returns the concatenated html content of the
+// presumed continuation chain.
+function collectPostContentInComments(post, children, successCallback, errorCallback) {
+    // This function implements a basic heuristic for identifying content containing comment chains
+    var isContentComment = function(comment, depthOffset) {
+        var authorReplyingToHimself = comment.depth + depthOffset > 1; // Either author talks to himself or this is a chain
+        var contentIsKindaLengthy = comment.body_html.length > 2048; // Author might be long winded or this is a chain
+
+        return authorReplyingToHimself || contentIsKindaLengthy;
+    };
+
+    var collectPostAuthorContentRecurse = function(comments, relativeParentPermalink, depth, contentCallback) {
+        for (var i = 0; i < comments.length; ++i) {
+            if (comments[i].kind == "more") {
+                console.log("Depth limit exceeded. Need to fetch " + relativeParentPermalink + " to continue.");
+                var parentPermalink = unshorten(relativeParentPermalink);
+                requestRedditJSONCached(parentPermalink, function(json) {
+                    var moreChildren = json[1].data.children[0].data.replies.data.children;
+                    collectPostAuthorContentRecurse(moreChildren, relativeParentPermalink, comments[i].data.depth, contentCallback);
+                }, errorCallback);
+                return;
+            } else {
+                var comment = comments[i].data;
+                if (comment.author == post.author && isContentComment(comment, depth)) {
+                    console.log("Found content in #" + i + " comment " + comment.name + " in depth " + (depth + comment.depth) + " with " + comment.body_html.length + " length.")
+                    var content = he.decode(comment.body_html);
+                    if (comment.replies) {
+                        collectPostAuthorContentRecurse(comment.replies.data.children, comment.permalink, depth, function (additionalContent) {
+                            contentCallback(content + additionalContent);
+                        });
+                    } else {
+                        contentCallback(content);
+                    }
+                    return;
+                }
+            }
+        }
+        contentCallback("");
+    };
+
+    collectPostAuthorContentRecurse(children, post.permalink, 0, successCallback);
+}
+
 // Given the URL to a reddit HFY post retrieves this function retrieves it.
 // - If successful successCallback is called with a post object of the following
 //   structure {author:string, title:string, name:string, content:string, url:string}.
@@ -197,22 +246,29 @@ function collectPost(url, successCallback, errorCallback)
     }
 
     requestRedditJSONCached(unshortenedUrl, function(json) {
-        var post = json[0]['data']['children'][0]['data']; // Post data
-        var content = he.decode(post.selftext_html);
+        var post = json[0].data.children[0].data; // Post data
+        var children = json[1].data.children;
 
         if (authorBlacklist.indexOf(post.author.toLowerCase()) > -1) {
             errorCallback("The author of '" + post.url + "' requested that his posts should not be processed with this tool.");
             return;
         }
 
-        var collectedPost = {
-            author: post.author,
-            title: post.title,
-            name: post.name,
-            content: content,
-            url: post.url
-        };
-        successCallback(collectedPost);
+        var content = he.decode(post.selftext_html);
+        collectPostContentInComments(post, children,
+            function(comment_content) {
+                var collectedPost = {
+                    author: post.author,
+                    title: post.title,
+                    name: post.name,
+                    content: content + comment_content,
+                    url: post.url
+                };
+                successCallback(collectedPost);
+            },
+            errorCallback
+        );
+
     }, errorCallback);
 }
 
@@ -431,6 +487,7 @@ function createAndDownloadSeriesAsEpub(event)
 {
     event.preventDefault();
 
+    var epubMakerBtn = document.getElementById("epubMakerBtn");
     epubMakerBtn.disabled = true;
     var startUrl = getStartUrl();
     var parts = getPartsFromList();
@@ -493,6 +550,7 @@ function createAndDownloadSeriesAsEpub(event)
 function retrieveSeriesInfo(event)
 {
     event.preventDefault();
+    var retrieveInfoBtn = document.getElementById("retrieveInfoBtn");
     retrieveInfoBtn.disabled = true;
     clearPartsFromList();
     var startUrl = getStartUrl().replace(/^http:\/\//i, 'https://'); // Ensure https to prevent mixed content
