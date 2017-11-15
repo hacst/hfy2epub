@@ -209,7 +209,7 @@ function collectPostContentInComments(post, children, successCallback, errorCall
 
     var collectPostAuthorContentRecurse = function(comments, relativeParentPermalink, depth, contentCallback) {
         for (var i = 0; i < comments.length; ++i) {
-            if (comments[i].kind == "more") {
+            if (comments[i].kind == "more" && comments[i].data.id == "_") {
                 console.log("Depth limit exceeded. Need to fetch " + relativeParentPermalink + " to continue.");
                 var parentPermalink = unshorten(relativeParentPermalink);
                 requestRedditJSONCached(parentPermalink, function(json) {
