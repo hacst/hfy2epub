@@ -177,12 +177,22 @@ function isNameCached(name) {
     return isCached(urlFromName(name));
 }
 
+// Returns true if the link points to the HFY wiki
+function isWikiLink(url) {
+    return !!url.match(/r\/HFY\/wiki/i);
+}
+
 // Due to CORS we cannot work with shortened URI. Luckily reddits URL shortener is special
 // so as long as we know the subreddit we are working with we can unshorten ourselves.
 // This function also normalizes the name to improve caching
 function unshorten(url)
 {
-    return urlFromName(nameFromURL(url));
+    if (!isWikiLink(url)) {
+        return urlFromName(nameFromURL(url));
+    } else {
+        // Cannot normalize wiki links so just make sure they are https
+        return url.replace(/^http:\/\//i, 'https://');
+    }
 }
 
 // Given a post and child data for it heuristically tries to determine whether the author
@@ -489,7 +499,7 @@ function createAndDownloadSeriesAsEpub(event)
 
     var epubMakerBtn = document.getElementById("epubMakerBtn");
     epubMakerBtn.disabled = true;
-    var startUrl = getStartUrl();
+
     var parts = getPartsFromList();
     collectPartPosts(parts, {
         collectedPost: function (post) {
@@ -553,7 +563,7 @@ function retrieveSeriesInfo(event)
     var retrieveInfoBtn = document.getElementById("retrieveInfoBtn");
     retrieveInfoBtn.disabled = true;
     clearPartsFromList();
-    var startUrl = getStartUrl().replace(/^http:\/\//i, 'https://'); // Ensure https to prevent mixed content
+    var startUrl = unshorten(getStartUrl());
 
     requestRedditJSONCached(startUrl, function(json) {
         if (json.kind == "wikipage") {
