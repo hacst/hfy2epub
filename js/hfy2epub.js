@@ -16,6 +16,11 @@ var authorBlacklist = [
 var postNameBlacklist = [
 ];
 
+// Authors can add this string to title or content of their posts
+// to state that they do not want it turned into an EPUB. Please
+// respect their wishes and do not remove the blacklisting code
+var blacklistTag = "[NOEPUB]";
+
 // Attempts to retrieve the given reddit URL in json. For this it appends .json to the url
 //  If successful calls successCallback with the JSON object of the page
 //  If the request fails errorCallback is called with an error string describing the failure
@@ -196,8 +201,10 @@ function unshorten(url)
 }
 
 // Given a post and child data for it heuristically tries to determine whether the author
-// continue the story in the comments and returns the concatenated html content of the
-// presumed continuation chain.
+// continue the story in the comments.
+// - If no error occurs successCallback is called with the concatenated html content of the
+//   presumed continuation chain as a string.
+// - If an error occurs errorCallback is called with a string describing the fault.
 function collectPostContentInComments(post, children, successCallback, errorCallback) {
     // This function implements a basic heuristic for identifying content containing comment chains
     var isContentComment = function(comment, depthOffset) {
@@ -265,6 +272,12 @@ function collectPost(url, successCallback, errorCallback)
         }
 
         var content = he.decode(post.selftext_html);
+
+        if (post.title.indexOf(blacklistTag) > -1 || content.indexOf(blacklistTag) > -1) {
+            errorCallback("The author of '" + unshortenedUrl + "' marked this post with " + blacklistTag + ". This tool will not process post with this tag.");
+            return;
+        }
+
         collectPostContentInComments(post, children,
             function(comment_content) {
                 var collectedPost = {
@@ -608,19 +621,20 @@ function retrieveSeriesInfo(event)
                             document.getElementById("epubMakerBtn").scrollIntoView(false);
                             retrieveInfoBtn.disabled = false;
                         },
-                        error: function(e) {
-                            var msg = "Error while following series links. Reason: " + e;
-                            log(e, "danger");
-                            console.log(e);
-                            alert(e);
+                        error: function(error) {
+                            var msg = "Error while following series links. Reason: " + error;
+                            log(msg, "danger");
+                            console.log(msg);
+                            alert(msg);
                             retrieveInfoBtn.disabled = false;
                         }
                     });
                 },
                 function (error) {
-                    console.log(error.log);
-                    console.log(error.request);
-                    log("Failed to retrieve series info (" + error.message + ")", "error");
+                    var msg = "Failed to retrieve series info. Reason: " + error;
+                    log(msg, "danger");
+                    console.log(msg);
+                    alert(msg);
                     retrieveInfoBtn.disabled = false;
                 });
         }

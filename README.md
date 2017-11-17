@@ -24,5 +24,8 @@ This tool has no ambitions to do everything for everyone. Series information det
 
 Also this tool makes no attempt to create an especially pretty EPUB. It simply slaps the HTML of first post of each detected part of the series into the EPUB. It is meant for reading not distribution.
 
+Safari earlier than version 10.1 is not compatible with this tool due to limitations in file download handling.
+
 ## For authors
-While we are very explicit about the user having to ensure the author is ok with it before using this tool and consider any EPUBs created the user's responsibility we have some limited ways to further discourage the use of the tool on your content. If you are an HFY author and do not want this tool to process your posts please create an issue on github so we can blacklist your posts. Note that this can not stop someone willing to edit the code to remove the block.
+While we are very explicit about the user having to ensure the author is ok with it before using this tool and consider any EPUBs created the user's responsibility we have some limited ways to further discourage the use of the tool on your content. If you are an HFY author and do not want this tool to process your posts you can include the text "[NOEPUB]" in the title or content of your post to make the tool refuse to process it. Alternatively you can create an issue on github and we can blacklist your username. Note that this can not stop someone willing to edit the code to remove the block.
+
