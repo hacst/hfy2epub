@@ -765,10 +765,10 @@ var entitiesMap = { // See https://www.w3.org/TR/html4/sgml/entities.html
 // Function that does a best-effort "conversion" from the HTML we see in
 // reddit posts to the XHTML expected in EPUBs
 function epubXHTMLFromRedditHTML(html) {
-    // For now we just replace HTML entities with their unicode encoding
-    return html.replace(/&\w+\;/g, function(match) {
-        return entitiesMap[match] || match;
-    })
+    return html.replace(/<a href="\//gi, '<a href="https://www.reddit.com/') // Make reddit internal links absolute. Makes assumptions.
+        .replace(/&\w+\;/g, function(match) { // Replace named HTML entities with XHTML compatible numbered ones
+            return entitiesMap[match] || match;
+        });
 };
 
 // Creates a epub files with the current title, author and parts from the #partsrow-table
