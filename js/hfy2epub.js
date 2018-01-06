@@ -539,7 +539,7 @@ function createAndDownloadSeriesAsEpub(event)
                         '<h3>by <a href="https://reddit.com/u/' + he.encode(author) + '">' + he.encode(author) + '</a></h3>' +
                         '<p>This EPUB was created using <a href="https://github.com/hacst/hfy2epub">https://github.com/hacst/hfy2epub</a> and must not to be distributed without the author\'s consent</p>' +
                         '</div>' +
-                        '<div style=”page-break-before:always;”></div>'
+                        '<div style="page-break-before:always;"></div>'
                     }, false, true)
                 );
 
