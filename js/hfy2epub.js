@@ -530,9 +530,12 @@ function createAndDownloadSeriesAsEpub(event)
             var author = document.querySelector('#seriesAuthor').value;
 
             var epubMaker = new EpubMaker()
+                .withUuid(author + " - " + title)
                 .withTemplate('idpf-wasteland')
                 .withTitle(title)
                 .withAuthor(author)
+                .withLanguage('en')
+                .withModificationDate(new Date())
                 .withSection(new EpubMaker.Section('titlepage', 'titlepage', {
                         content: '<div style="text-align: center;">' +
                         '<h1>' + he.encode(title) + '</h1>' +
